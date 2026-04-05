@@ -181,10 +181,23 @@ export default function Tracking({ archetype, rules, recommendedTheories, onRest
     })
   }
 
-  // AI メンタリング呼び出し
-  const fetchMentoring = async (statusText, memo) => {
+  // AI メンタリング呼び出し（科学的知見付き）
+  const fetchMentoring = async (statusText, memoText) => {
     const endpoint = import.meta.env.VITE_WORKER_ENDPOINT
     if (!endpoint) return null
+
+    // 直近3日分の記録を収集（パターン検出用）
+    const recentDays = []
+    for (let i = Math.max(1, currentDay - 2); i <= currentDay; i++) {
+      const d = trackingData[`day${i}`]
+      if (d && d.ruleResults) {
+        recentDays.push({
+          day: i,
+          failedRules: d.ruleResults.filter(r => !r.achieved).map(r => r.ruleText),
+          achievedCount: d.ruleResults.filter(r => r.achieved).length,
+        })
+      }
+    }
 
     try {
       setAiLoading(true)
@@ -192,11 +205,14 @@ export default function Tracking({ archetype, rules, recommendedTheories, onRest
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          archetypeId: archetype.id,
+          archetype: archetype.id,
           day: currentDay,
           status: statusText,
-          memo,
-          rules: rules.map(r => r.text),
+          memo: memoText,
+          protocols: recommendedTheories,
+          profile: data.diagnosis?.answers?.profile,
+          targetWeight: data.diagnosis?.answers?.targetWeight,
+          recentDays,
         }),
       })
       if (!res.ok) throw new Error('API error')
