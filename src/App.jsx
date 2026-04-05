@@ -8,6 +8,15 @@ function App() {
   const [screen, setScreen] = useState('landing')
   const [diagnosisResult, setDiagnosisResult] = useState(null)
 
+  // ?reset パラメータでデータクリア
+  useEffect(() => {
+    if (window.location.search.includes('reset')) {
+      localStorage.removeItem('dietMVP_data')
+      window.location.replace(window.location.pathname)
+      return
+    }
+  }, [])
+
   // localStorage から復元（トラッキング途中で再訪した場合）
   useEffect(() => {
     const saved = localStorage.getItem('dietMVP_data')
