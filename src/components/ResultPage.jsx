@@ -20,6 +20,7 @@ export default function ResultPage({
   archetype,
   excludedTheories,
   recommendedTheories,
+  theoryReasons,
   rules,
   narrative,
   bioContextCards,
@@ -125,13 +126,40 @@ export default function ResultPage({
         </div>
       </section>
 
-      {/* ===== Section D: 推奨プロトコル ===== */}
+      {/* ===== Section D-1: なぜこの理論が選ばれたか ===== */}
+      <section className="mb-8">
+        <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">
+          あなたに合う理論
+        </h3>
+        <div className="space-y-3">
+          {theoryReasons.map((t, idx) => (
+            <div key={idx} className="bg-card rounded-xl p-4 border border-border">
+              <div className="flex items-start gap-3">
+                <span className="text-lg shrink-0 mt-0.5">✅</span>
+                <div>
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h4 className="text-sm font-bold text-text">{t.name}</h4>
+                    {t.evidence && (
+                      <span className="text-[10px] px-1.5 py-0.5 bg-accent/10 text-accent rounded">
+                        エビデンス {t.evidence}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-text-muted leading-relaxed">{t.reason}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== Section D-2: 具体的なルール ===== */}
       <section className="mb-10">
         <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">
           推奨プロトコル
         </h3>
         <p className="text-xs text-text-muted mb-4">
-          ベース理論: {recommendedTheories.join(' + ')}
+          上記の理論を、あなたの生活で実行できるルールに変換しました。
         </p>
 
         <div className="space-y-3">
@@ -154,9 +182,14 @@ export default function ResultPage({
                     <h4 className="text-sm font-bold text-text mb-1">
                       ルール {idx + 1}: {rule.text}
                     </h4>
-                    <p className="text-xs text-text-muted leading-relaxed">
+                    <p className="text-xs text-text-muted leading-relaxed mb-2">
                       {rule.detail}
                     </p>
+                    {rule.theory && (
+                      <span className="inline-block text-[10px] px-2 py-0.5 bg-accent/8 text-accent/70 rounded border border-accent/15">
+                        {rule.theory}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

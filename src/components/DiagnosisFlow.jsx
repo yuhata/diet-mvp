@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { QUESTIONS } from '../data/questions'
-import { parseAnswers, determineArchetype, generateRules, getRecommendedTheories } from '../logic/matchingEngine'
+import { parseAnswers, determineArchetype, generateRules, getRecommendedTheories, getTheoryReasons } from '../logic/matchingEngine'
 import { applyExclusionRules, getAlternativeCards } from '../logic/exclusionRules'
 import { getNarrative, getBiologicalContextCards } from '../logic/narrativeGenerator'
 
@@ -69,11 +69,14 @@ export default function DiagnosisFlow({ onComplete, onBack }) {
         }
       }
 
+      const theoryReasons = getTheoryReasons(recommendedTheories)
+
       onComplete({
         answers: parsed,
         archetype,
         excludedTheories: displayExcluded,
         recommendedTheories,
+        theoryReasons,
         rules,
         narrative,
         bioContextCards,
