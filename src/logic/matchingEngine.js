@@ -31,7 +31,9 @@ export function parseAnswers(raw) {
     failReason:   raw.q6,
     mealTiming:   raw.q7 || [],   // 複数選択の配列
     sleepPattern: raw.q8,
-    timeline:     raw.q9,
+    timeline:     raw.q9?.timeline || raw.q9,
+    targetWeight: raw.q9?.targetWeight || null,
+    profile:      raw.profile || {},
   };
 }
 
@@ -41,7 +43,7 @@ const ARCHETYPES = [
     id: 'male_40s_visceral',
     label: '40代男性・内臓脂肪型',
     match: (a) =>
-      a.gender === '��性' && a.age === '男性40代' &&
+      a.gender === '男性' && a.age === '男性40代' &&
       a.bodyGoal.includes('内臓脂肪・お腹まわり'),
     primary: ['間欠断食 16:8', '低糖質（外食版）', '高タンパク質'],
     secondary: ['腹八分目原則'],
@@ -53,7 +55,7 @@ const ARCHETYPES = [
     id: 'athlete_body_comp',
     label: '運動習慣あり・体組成改善型',
     match: (a) =>
-      a.activity === '週3回���上は動いている' &&
+      a.activity === '週3回以上は動いている' &&
       (a.bodyGoal.includes('筋肉をつけながら絞りたい') ||
        a.bodyGoal.includes('体重より体脂肪・体組成を改善したい')),
     primary: ['高タンパク質', 'カーボサイクリング'],
@@ -110,7 +112,7 @@ const ARCHETYPES = [
   },
   {
     id: 'male_50s_plus',
-    label: '50代以上男性・健康維���型',
+    label: '50代以上男性・健康維持型',
     match: (a) =>
       a.gender === '男性' && a.age === '男性50代以上',
     primary: ['地中海食', '間欠断食 16:8'],
@@ -125,7 +127,9 @@ const ARCHETYPES = [
     match: (a) =>
       a.foodPattern.includes('自炊中心でコントロールできる') &&
       (a.timeline === '3ヶ月かけてしっかり変えたい' ||
-       a.timeline === '半年〜1年で体質改善したい'),
+       a.timeline === '半年〜1年で体質改善したい' ||
+       a.timeline === '3ヶ月' ||
+       a.timeline === '半年'),
     primary: ['地中海食', 'CICO'],
     secondary: ['低糖質', '高タンパク質'],
     complement: [],
@@ -137,7 +141,7 @@ const ARCHETYPES = [
     label: '20〜30代女性・PMS・月経周期型',
     match: (a) =>
       a.gender === '女性' && a.age === '女性20〜30代' &&
-      (a.failReason === 'ストレス過食タイプ（食べると落ち着く���' ||
+      (a.failReason === 'ストレス過食タイプ（食べると落ち着く）' ||
        a.foodPattern.includes('間食・甘いものがやめられない')),
     primary: ['マインドフルイーティング', '低糖質'],
     secondary: ['和食', '高タンパク質'],
@@ -185,7 +189,7 @@ const ARCHETYPES = [
     match: (a) =>
       a.failReason === '忙しくて食事が雑になるタイプ',
     primary: ['間欠断食 16:8', '腹八分目原則'],
-    secondary: ['���糖質（外食版）'],
+    secondary: ['低糖質（外食版）'],
     complement: [],
     biologicalContext: [],
     ruleCount: 1,
@@ -195,7 +199,7 @@ const ARCHETYPES = [
     label: '食欲は強くないが痩せないタイプ',
     match: (a) =>
       a.failReason === '食欲自体は強くないが痩せない',
-    primary: ['日本人���性配慮型', '低糖質'],
+    primary: ['日本人特性配慮型', '低糖質'],
     secondary: ['CGM連携型', '和食'],
     complement: ['代謝・血糖チェック推奨'],
     biologicalContext: ['japanese_low_bmi_visceral'],
@@ -203,10 +207,10 @@ const ARCHETYPES = [
   },
   {
     id: 'knowledge_no_action',
-    label: '理屈はわかるが続かな��タイプ',
+    label: '理屈はわかるが続かないタイプ',
     match: () => true, // デフォルト
     primary: ['間欠断食 16:8', '腹八分目原則'],
-    secondary: ['低糖��（外食版）'],
+    secondary: ['低糖質（外食版）'],
     complement: ['CBT系'],
     biologicalContext: [],
     ruleCount: 1,
@@ -350,7 +354,7 @@ const RULE_TEMPLATES = {
 };
 
 /**
- * アーキタイプと除外結果からルール文��生成
+ * アーキタイプと除外結果からルール文を生成
  */
 export function generateRules(archetype, answers) {
   const template = RULE_TEMPLATES[archetype.id] || RULE_TEMPLATES.knowledge_no_action;
@@ -390,7 +394,7 @@ export function getRecommendedTheories(archetype, excludedTheories) {
 
   // それでも空なら腹八分目原則 + 間欠断食16:8
   if (recommended.length === 0) {
-    recommended.push('腹八分目原���', '間欠断食 16:8');
+    recommended.push('腹八分目原則', '間欠断食 16:8');
   }
 
   return recommended;

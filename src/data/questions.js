@@ -88,12 +88,12 @@ export const QUESTIONS = [
   },
   {
     id: 'q9',
-    label: '目標期間感',
-    type: 'single',
-    options: [
-      '1ヶ月で結果を出したい',
-      '3ヶ月かけてしっかり変えたい',
-      '半年〜1年で体質改善したい',
+    label: '目標設定',
+    type: 'goal',
+    timelineOptions: [
+      '1ヶ月',
+      '3ヶ月',
+      '半年',
       '期間より継続性重視',
     ],
   },
