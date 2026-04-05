@@ -133,13 +133,15 @@ export default function Tracking({ archetype, rules, recommendedTheories, onRest
   const startWeight = data.diagnosis?.answers?.profile?.weight
   const targetWeight = data.diagnosis?.answers?.targetWeight
 
-  // 開始日と現在の日数を算出
+  // 開始日と現在の日数を算出（?day=N でテスト用に上書き可能）
+  const urlDay = new URLSearchParams(window.location.search).get('day')
   const startDate = data.diagnosis?.timestamp
     ? new Date(data.diagnosis.timestamp)
     : new Date()
   const now = new Date()
   const diffMs = now - startDate
-  const currentDay = Math.min(14, Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)) || 1))
+  const calcDay = Math.min(14, Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)) || 1))
+  const currentDay = urlDay ? Math.min(14, Math.max(1, parseInt(urlDay, 10))) : calcDay
 
   // localStorage からトラッキングデータ復元
   useEffect(() => {
