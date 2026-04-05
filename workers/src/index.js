@@ -139,6 +139,7 @@ export default {
       const {
         archetype, day, status, memo, protocols,
         profile, targetWeight, recentDays,
+        foodPattern, failReason, mealTiming, tomorrowPlan,
       } = await request.json();
 
       const knowledge = ARCHETYPE_KNOWLEDGE[archetype] || ARCHETYPE_KNOWLEDGE.knowledge_no_action;
@@ -172,30 +173,53 @@ export default {
         }
       }
 
-      const systemPrompt = `あなたはダイエットメンターです。世界中のダイエット理論を横断リサーチした科学的知見に基づいてアドバイスします。
+      // 食環境コンテキスト
+      let foodContext = '';
+      if (foodPattern && foodPattern.length > 0) {
+        foodContext = `食生活: ${foodPattern.join('、')}\n`;
+      }
+      if (failReason) foodContext += `続かない理由: ${failReason}\n`;
+      if (mealTiming && mealTiming.length > 0) {
+        foodContext += `食事タイミング: ${mealTiming.join('、')}\n`;
+      }
 
-## ユーザー情報
+      const systemPrompt = `あなたはダイエットメンターです。世界中のダイエット理論を横断リサーチした科学的知見に基づき、この人だけに合ったアドバイスをします。
+
+## このユーザーの具体的な状況
 タイプ: ${archetype}
 推奨プロトコル: ${(protocols || []).join('、')}
-${userContext}
+${userContext}${foodContext}
 ## 科学的知見（このユーザータイプに関連する研究結果）
 ${knowledge}
 
 ## 現在のフェーズ
 ${phase}
 
+## 状況別の具体的メニュー知識
+【外食・居酒屋】低糖質: 刺身、焼き鳥（塩）、冷奴、枝豆、焼き魚、サラダ。避ける: 締めのラーメン・チャーハン・うどん
+【コンビニ】低糖質: サラダチキン、ゆで卵、ブランパン、ナッツ、チーズ。避ける: おにぎり2個以上、菓子パン
+【ファミレス】低糖質: ハンバーグ（ライス抜きor半量）、サラダバー、グリルチキン。ライスをスープに変更
+【自炊】低糖質: 鶏胸肉のソテー、豆腐ステーキ、サバ缶サラダ、卵料理全般。主食を豆腐やカリフラワーライスに置換
+【飲酒時】ビール2杯→ハイボール/赤ワインに切替。つまみ: 枝豆・刺身・焼き鳥。飲み後の締め→水+ナッツで代替
+【間欠断食中の朝】OK: 水、ブラックコーヒー、緑茶。NG: 砂糖入り飲料、牛乳入りカフェラテ（少量ならOK）
+【高タンパク質】1食の目安=手のひらサイズの肉or魚。卵2個。納豆+豆腐。プロテインドリンク
+
 ## 回答ルール
-- 3-4文の日本語で返す
-- 1文目: 今日の状況への端的な評価（良い悪いではなく、構造的に何が起きたか）
+- 4-5文の日本語で返す
+- 1文目: 今日の状況への端的な評価（「あなたの場合」「あなたの食環境では」等、パーソナルに）
 - 2文目: 関連する科学的知見を1つ引用して「なぜそうなるか」を説明
-- 3文目: 明日の具体的な1アクション
-- 4文目（任意）: フェーズに応じた中期的な視点
+- 3文目: 明日の具体的な1アクション（具体的なメニュー名や食品名を必ず含める）
+- 4文目: フェーズに応じた中期的な視点
+- 5文目（任意）: 明日の予定に対する先回りアドバイス
+- 「あなたの場合」「あなたの食環境では」等、個人に語りかける表現を使う
 - 「意志力ではなくホルモン・構造・環境の問題」というフレームを必ず使う
 - 崩れた日は「想定内」として正常化する
+- 具体的な食品名・メニュー名を挙げて「何を食べればいいか」を明確にする
 - 過度な励ましや褒め言葉は不要。淡々と科学的に
-- ${patternNote ? '同じルールが連続で崩れている場合は、そのルール自体の難易度調整を提案する' : ''}`;
+- ${patternNote ? '同じルールが連続で崩れている場合は、そのルール自体の難易度調整を具体的に提案する' : ''}`;
 
-      const userMessage = `Day ${day}日目。${status}。メモ: ${memo || 'なし'}${patternNote ? '\n' + patternNote : ''}`;
+      const tomorrowContext = tomorrowPlan ? `\n明日の予定: ${tomorrowPlan}` : '';
+      const userMessage = `Day ${day}日目。${status}。メモ: ${memo || 'なし'}${patternNote ? '\n' + patternNote : ''}${tomorrowContext}`;
 
       const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',

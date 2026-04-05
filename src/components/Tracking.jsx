@@ -122,6 +122,7 @@ export default function Tracking({ archetype, rules, recommendedTheories, onRest
   const [ruleResults, setRuleResults] = useState(() => rules.map(() => null)) // null = 未選択, true = 達成, false = 未達成
   const [todayWeight, setTodayWeight] = useState('')
   const [todayMemo, setTodayMemo] = useState('')
+  const [tomorrowPlan, setTomorrowPlan] = useState('')
   const [aiMessage, setAiMessage] = useState(null)
   const [aiLoading, setAiLoading] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -212,6 +213,10 @@ export default function Tracking({ archetype, rules, recommendedTheories, onRest
           protocols: recommendedTheories,
           profile: data.diagnosis?.answers?.profile,
           targetWeight: data.diagnosis?.answers?.targetWeight,
+          foodPattern: data.diagnosis?.answers?.foodPattern,
+          failReason: data.diagnosis?.answers?.failReason,
+          mealTiming: data.diagnosis?.answers?.mealTiming,
+          tomorrowPlan: tomorrowPlan || null,
           recentDays,
         }),
       })
@@ -455,13 +460,25 @@ export default function Tracking({ archetype, rules, recommendedTheories, onRest
 
           {/* メモ */}
           <div>
-            <label className="text-xs text-text-muted block mb-1">メモ（任意）</label>
+            <label className="text-xs text-text-muted block mb-1">今日の振り返り（任意）</label>
             <input
               type="text"
               value={todayMemo}
               onChange={(e) => setTodayMemo(e.target.value)}
               className="w-full bg-bg border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-muted/40 focus:outline-none focus:border-accent"
-              placeholder="今日の気づきなど"
+              placeholder="例：会食でつい食べすぎた"
+            />
+          </div>
+
+          {/* 明日の予定 */}
+          <div>
+            <label className="text-xs text-text-muted block mb-1">明日の予定（任意・AIが先回りアドバイス）</label>
+            <input
+              type="text"
+              value={tomorrowPlan}
+              onChange={(e) => setTomorrowPlan(e.target.value)}
+              className="w-full bg-bg border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-muted/40 focus:outline-none focus:border-accent"
+              placeholder="例：明日は飲み会 / 在宅勤務 / 外食ランチ"
             />
           </div>
 
