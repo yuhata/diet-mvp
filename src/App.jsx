@@ -10,7 +10,8 @@ function App() {
 
   // ?reset パラメータでデータクリア
   useEffect(() => {
-    if (window.location.search.includes('reset')) {
+    const params = new URLSearchParams(window.location.search)
+    if (params.has('reset')) {
       localStorage.removeItem('dietMVP_data')
       window.location.replace(window.location.pathname)
       return
@@ -19,14 +20,15 @@ function App() {
 
   // localStorage から復元（トラッキング途中で再訪した場合）
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
     const saved = localStorage.getItem('dietMVP_data')
     if (saved) {
       try {
         const data = JSON.parse(saved)
         if (data.diagnosis) {
           setDiagnosisResult(data.diagnosis)
-          // トラッキングデータがあればトラッキング画面へ
-          if (data.tracking && Object.keys(data.tracking).length > 0) {
+          // ?day=N パラメータがある場合、またはトラッキングデータがある場合はトラッキング画面へ
+          if (params.has('day') || (data.tracking && Object.keys(data.tracking).length > 0)) {
             setScreen('tracking')
           } else {
             setScreen('result')
