@@ -43,7 +43,7 @@ const BIO_CONTEXTS = [
     id: 'testosterone_visceral_cycle',
     trigger: (a) =>
       a.gender === '男性' && a.age === '男性40代' &&
-      a.bodyGoal === '内臓脂肪・お腹まわり' &&
+      a.bodyGoal.includes('内臓脂肪・お腹まわり') &&
       a.activity === '週3回以上は動いている',
     icon: '🧪',
     title: '運動しているのに落ちない理由',
@@ -82,8 +82,8 @@ const BIO_CONTEXTS = [
     id: 'muscle_metabolism_diff',
     trigger: (a) =>
       a.activity === '週3回以上は動いている' &&
-      (a.bodyGoal === '筋肉をつけながら絞りたい' ||
-       a.bodyGoal === '体重より体脂肪・体組成を改善したい'),
+      (a.bodyGoal.includes('筋肉をつけながら絞りたい') ||
+       a.bodyGoal.includes('体重より体脂肪・体組成を改善したい')),
     icon: '💪',
     title: '筋肉と脂肪の「代謝の差」を活かす',
     body: '筋肉量1kgの増加は基礎代謝を1日約50〜100kcal向上させます。体重が同じでも、筋肉が多い人の方が食べても太りにくい身体になります。タンパク質を十分に摂ることが体組成改善の最短経路です。',

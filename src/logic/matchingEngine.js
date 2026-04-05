@@ -24,12 +24,12 @@ export function parseAnswers(raw) {
   return {
     gender,
     age,
-    bodyGoal:     raw.q2,
+    bodyGoal:     raw.q2 || [],    // 複数選択の配列
     foodPattern:  raw.q3 || [],   // 複数選択の配列
     activity:     raw.q4,
-    experience:   raw.q5,
+    experience:   raw.q5 || [],   // 複数選択の配列
     failReason:   raw.q6,
-    mealTiming:   raw.q7,
+    mealTiming:   raw.q7 || [],   // 複数選択の配列
     sleepPattern: raw.q8,
     timeline:     raw.q9,
   };
@@ -42,7 +42,7 @@ const ARCHETYPES = [
     label: '40代男性・内臓脂肪型',
     match: (a) =>
       a.gender === '��性' && a.age === '男性40代' &&
-      a.bodyGoal === '内臓脂肪・お腹まわり',
+      a.bodyGoal.includes('内臓脂肪・お腹まわり'),
     primary: ['間欠断食 16:8', '低糖質（外食版）', '高タンパク質'],
     secondary: ['腹八分目原則'],
     complement: ['週2回の筋力トレーニング推奨'],
@@ -54,8 +54,8 @@ const ARCHETYPES = [
     label: '運動習慣あり・体組成改善型',
     match: (a) =>
       a.activity === '週3回���上は動いている' &&
-      (a.bodyGoal === '筋肉をつけながら絞りたい' ||
-       a.bodyGoal === '体重より体脂肪・体組成を改善したい'),
+      (a.bodyGoal.includes('筋肉をつけながら絞りたい') ||
+       a.bodyGoal.includes('体重より体脂肪・体組成を改善したい')),
     primary: ['高タンパク質', 'カーボサイクリング'],
     secondary: ['低糖質', '間欠断食 16:8'],
     complement: [],
@@ -67,7 +67,7 @@ const ARCHETYPES = [
     label: '高血圧・心血管リスク型',
     match: (a) =>
       (a.age === '男性50代以上' || a.age === '女性40代以上') &&
-      a.bodyGoal === '全体的に体重を落としたい',
+      a.bodyGoal.includes('全体的に体重を落としたい'),
     primary: ['DASH', '地中海食'],
     secondary: ['低糖質', 'フレキシタリアン'],
     complement: [],

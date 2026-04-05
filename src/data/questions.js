@@ -10,8 +10,8 @@ export const QUESTIONS = [
   },
   {
     id: 'q2',
-    label: '現在の体型・悩み',
-    type: 'single',
+    label: '現在の体型・悩み（複数選択可）',
+    type: 'multi',
     options: [
       '内臓脂肪・お腹まわり',
       '全体的に体重を落としたい',
@@ -44,8 +44,8 @@ export const QUESTIONS = [
   },
   {
     id: 'q5',
-    label: '過去のダイエット経験',
-    type: 'single',
+    label: '過去のダイエット経験（複数選択可）',
+    type: 'multi',
     options: [
       'ほぼ未経験',
       '糖質制限を試したことがある',
@@ -66,8 +66,8 @@ export const QUESTIONS = [
   },
   {
     id: 'q7',
-    label: '1日の食事タイミング',
-    type: 'single',
+    label: '1日の食事タイミング（複数選択可）',
+    type: 'multi',
     options: [
       '朝・昼・夜3食規則的',
       '朝を抜くことが多い',

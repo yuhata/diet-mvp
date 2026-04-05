@@ -87,7 +87,7 @@ const EXCLUSION_RULES = [
     theory: 'CICO',
     condition: (a) =>
       a.age === '男性40代' &&
-      a.bodyGoal === '内臓脂肪・お腹まわり' &&
+      a.bodyGoal.includes('内臓脂肪・お腹まわり') &&
       a.activity === '週3回以上は動いている',
     reason: '運動しているのに内臓脂肪が減りにくい場合、テストステロン低下による代謝変化が主因の可能性があります。カロリーを減らすだけではこの悪循環は切れません。',
   },
